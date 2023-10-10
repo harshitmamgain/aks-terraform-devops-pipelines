@@ -1,3 +1,22 @@
+data "azurerm_key_vault" "azure_vault" {
+  name                = var.keyvault_name
+  resource_group_name = var.keyvault_rg
+}
+
+data "azurerm_key_vault_secret" "ssh_public_key" {
+  name         = var.sshkvsecret
+  key_vault_id = data.azurerm_key_vault.azure_vault.id
+}
+
+data "azurerm_key_vault_secret" "spn_id" {
+  name         = var.clientidkvsecret
+  key_vault_id = data.azurerm_key_vault.azure_vault.id
+}
+data "azurerm_key_vault_secret" "spn_secret" {
+  name         = var.spnkvsecret
+  key_vault_id = data.azurerm_key_vault.azure_vault.id
+}
+
 resource "azurerm_virtual_network" "aks_vnet" {
   name                = var.aks_vnet_name
   resource_group_name = azurerm_resource_group.aks_rg.name
@@ -51,23 +70,4 @@ resource "azurerm_kubernetes_cluster" "aks_cluster" {
   tags = {
     Environment = "Demo"
   }
-}
-
-data "azurerm_key_vault" "azure_vault" {
-  name                = var.keyvault_name
-  resource_group_name = var.keyvault_rg
-}
-
-data "azurerm_key_vault_secret" "ssh_public_key" {
-  name         = var.sshkvsecret
-  key_vault_id = data.azurerm_key_vault.azure_vault.id
-}
-
-data "azurerm_key_vault_secret" "spn_id" {
-  name         = var.clientidkvsecret
-  key_vault_id = data.azurerm_key_vault.azure_vault.id
-}
-data "azurerm_key_vault_secret" "spn_secret" {
-  name         = var.spnkvsecret
-  key_vault_id = data.azurerm_key_vault.azure_vault.id
 }
