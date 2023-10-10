@@ -1,5 +1,5 @@
 data "azurerm_key_vault" "azure_vault" {
-  name                = var.keyvault_name
+  name                = "aks-keyvault-eastus"
   resource_group_name = var.keyvault_rg
 }
 
