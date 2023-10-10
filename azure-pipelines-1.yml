@@ -21,3 +21,10 @@ steps:
     command: 'plan'
     environmentServiceName: 'AzuretoAzureDevOps'
     allowTelemetryCollection: false
+
+- task: TerraformCLI@1
+  displayName: Terraform Apply
+  inputs:
+    command: 'apply'
+    environmentServiceName: 'AzuretoAzureDevOps'
+    allowTelemetryCollection: true
