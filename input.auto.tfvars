@@ -14,7 +14,7 @@ keyvault_rg = "aks-deployment-rg"
 
 keyvault_name = "aks-keyvault-eastus"
 
-azure_region = "australiaeast"
+azure_region = "eastus"
 
 resource_group = "aksdemocluster-rg"
 
