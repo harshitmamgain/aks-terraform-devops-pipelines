@@ -12,8 +12,6 @@ subnetcidr = ["10.0.0.0/25"]
 
 keyvault_rg = "aks-deployment-rg"
 
-keyvault_name = "aks-keyvault-eastus"
-
 azure_region = "eastus"
 
 resource_group = "aksdemocluster-rg"
