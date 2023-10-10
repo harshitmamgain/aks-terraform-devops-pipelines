@@ -1,4 +1,4 @@
-data "azurerm_key_vault" "azure_vault" {
+data "azurerm_key_vault" "aks-keyvault-eastus" {
   name                = var.keyvault_name
   resource_group_name = var.keyvault_rg
 }
@@ -57,6 +57,11 @@ resource "azurerm_kubernetes_cluster" "aks_cluster" {
       key_data = data.azurerm_key_vault_secret.ssh_public_key.value
     }
   }
+
+  role_based_access_control {
+    enabled = true
+  }
+
   service_principal {
     client_id     = data.azurerm_key_vault_secret.spn_id.value
     client_secret = data.azurerm_key_vault_secret.spn_secret.value
