@@ -62,8 +62,4 @@ resource "azurerm_kubernetes_cluster" "aks_cluster" {
     client_id     = data.azurerm_key_vault_secret.spn_id.value
     client_secret = data.azurerm_key_vault_secret.spn_secret.value
   }
-
-  tags = {
-    Environment = "Demo"
-  }
 }
