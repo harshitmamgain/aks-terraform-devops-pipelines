@@ -1,30 +1,53 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
+#### Parameters
 
-trigger: none
+$keyvaultname = "aks-devops-kv"
+$location = "eastus"
+$keyvaultrg = "aks-aks-rg"
+$sshkeysecret = "akssshpubkey"
+$clientidkvsecretname = "spn-id"
+$spnkvsecretname = "spn-secret"
+$userobjectid = "xxxxx"
+$spnclientid = "xxxxxx"
+$spnclientsecret = "xxxxxx"
+$spobjectID = "xxxxx"
 
-pool:
-  vmImage: ubuntu-latest
 
-steps:
-- task: TerraformCLI@1
-  displayName: Terraform Init
-  inputs:
-    command: 'init'
-    allowTelemetryCollection: true
+#### Create Key Vault
 
-- task: TerraformCLI@1
-  displayName: Terraform Plan
-  inputs:
-    command: 'plan'
-    environmentServiceName: 'AzuretoAzureDevOps'
-    allowTelemetryCollection: false
+New-AzResourceGroup -Name $keyvaultrg -Location $location
 
-- task: TerraformCLI@1
-  displayName: Terraform Apply
-  inputs:
-    command: 'apply'
-    environmentServiceName: 'AzuretoAzureDevOps'
-    allowTelemetryCollection: true
+New-AzKeyVault -Name $keyvaultname -ResourceGroupName $keyvaultrg -Location $location
+
+Set-AzKeyVaultAccessPolicy -VaultName $keyvaultname -UserPrincipalName $userobjectid -PermissionsToSecrets get,set,delete,list
+
+#### create an ssh key for setting up password-less login between agent nodes.
+
+ssh-keygen  -f ~/.ssh/id_rsa_terraform
+
+
+#### Add SSH Key in Azure Key vault secret
+
+$pubkey = cat ~/.ssh/id_rsa_terraform.pub
+
+$Secret = ConvertTo-SecureString -String $pubkey -AsPlainText -Force
+
+Set-AzKeyVaultSecret -VaultName $keyvaultname -Name $sshkeysecret -SecretValue $Secret
+
+
+#### Store service principal Client id in Azure KeyVault
+
+$Secret = ConvertTo-SecureString -String $spnclientid -AsPlainText -Force
+
+Set-AzKeyVaultSecret -VaultName $keyvaultname -Name $clientidkvsecretname -SecretValue $Secret
+
+
+#### Store service principal Secret in Azure KeyVault
+
+$Secret = ConvertTo-SecureString -String $spnclientsecret -AsPlainText -Force
+
+Set-AzKeyVaultSecret -VaultName $keyvaultname -Name $spnkvsecretname -SecretValue $Secret
+
+
+#### Provide Keyvault secret access to SPN using Keyvault access policy
+
+Set-AzKeyVaultAccessPolicy -VaultName $keyvaultname -ServicePrincipalName $spobjectID -PermissionsToSecrets Get,Set
